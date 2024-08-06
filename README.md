@@ -53,13 +53,13 @@ Telegram的源码通常使用JDK 8进行编译，请确保安装了JDK 8，并�
 步骤 2: 获取Telegram源码
 克隆源码:
 打开命令行终端，运行以下命令来克隆Telegram的源码仓库：
-bash
-复制代码
+
+#####
 git clone https://github.com/DrKLO/Telegram.git
 进入克隆后的项目目录：
-bash
-复制代码
+#####
 cd Telegram
+####
 步骤 3: 导入Telegram项目到Android Studio
 启动Android Studio:
 

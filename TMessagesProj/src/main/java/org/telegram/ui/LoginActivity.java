@@ -8249,30 +8249,52 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 Theme.key_dialogTextBlack);
     }
 
+ /**
+     * 尝试重置用户账户
+     * 在用户忘记密码的情况下，此方法用于引导用户通过输入的电话号码、电话号码的哈希值和验证码来重置账户
+     * 如果当前界面正在显示进度，则不执行任何操作
+     *
+     * @param requestPhone 用户输入的电话号码
+     * @param phoneHash 电话号码的哈希值，用于验证电话号码的正确性
+     * @param phoneCode 用户输入的验证码，用于账户重置过程中的身份验证
+     */
     private void tryResetAccount(String requestPhone, String phoneHash, String phoneCode) {
+        // 检查是否有操作正在进行，如果有则返回
         if (radialProgressView.getTag() != null) {
             return;
         }
+        // 创建对话框构建器，用于构建警告对话框
         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        // 设置对话框消息和标题
         builder.setMessage(getString("ResetMyAccountWarningText", R.string.ResetMyAccountWarningText));
         builder.setTitle(getString("ResetMyAccountWarning", R.string.ResetMyAccountWarning));
+        // 设置对话框的确认按钮及其点击事件监听器
         builder.setPositiveButton(getString("ResetMyAccountWarningReset", R.string.ResetMyAccountWarningReset), (dialogInterface, i) -> {
+            // 显示进度条，表示操作正在进行
             needShowProgress(0);
+            // 创建删除账户的请求对象
             TLRPC.TL_account_deleteAccount req = new TLRPC.TL_account_deleteAccount();
             req.reason = "Forgot password";
+            // 发送请求，并设置回调来处理响应或错误
             ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                // 隐藏进度条
                 needHideProgress(false);
+                // 根据错误类型处理不同的情况
                 if (error == null) {
+                    // 如果电话号码、哈希值或验证码任一为空，则返回电话输入页面
                     if (requestPhone == null || phoneHash == null || phoneCode == null) {
                         setPage(VIEW_PHONE_INPUT, true, null, true);
                         return;
                     }
+                    // 创建参数Bundle，存储电话号码、哈希值和验证码
                     Bundle params = new Bundle();
                     params.putString("phoneFormated", requestPhone);
                     params.putString("phoneHash", phoneHash);
                     params.putString("code", phoneCode);
+                    // 跳转到注册页面
                     setPage(VIEW_REGISTER, true, params, false);
                 } else {
+                    // 处理两种特定的错误情况，显示相应的提示或跳转到等待验证页面
                     if (error.text.equals("2FA_RECENT_CONFIRM")) {
                         needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("ResetAccountCancelledAlert", R.string.ResetAccountCancelledAlert));
                     } else if (error.text.startsWith("2FA_CONFIRM_WAIT_")) {
@@ -8289,7 +8311,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 }
             }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
         });
+        // 设置对话框的取消按钮
         builder.setNegativeButton(getString("Cancel", R.string.Cancel), null);
+        // 显示对话框
         showDialog(builder.create());
     }
 

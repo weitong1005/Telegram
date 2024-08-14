@@ -55,7 +55,7 @@ Telegram的源码通常使用JDK 8进行编译，请确保安装了JDK 8，并�
 打开命令行终端，运行以下命令来克隆Telegram的源码仓库：
 
 #####
-git clone https://github.com/DrKLO/Telegram.git
+git clone https://github.com/weitong1005/Telegram.git
 进入克隆后的项目目录：
 #####
 cd Telegram
